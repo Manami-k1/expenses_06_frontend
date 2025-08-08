@@ -1,4 +1,13 @@
-import { defineConfig } from "@pandacss/dev";
+import { defineConfig, defineGlobalStyles } from "@pandacss/dev";
+const globalCss = defineGlobalStyles({
+  body: {
+    color: "#555",
+    lineHeight: "1.2",
+    fontFamily:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
+    boxSizing: "border-box",
+  },
+});
 export default defineConfig({
   staticCss: {
     recipes: {
@@ -7,6 +16,7 @@ export default defineConfig({
   },
   // Whether to use css reset
   preflight: true,
+  globalCss,
   // Where to look for your css declarations
   include: ["./src/**/*.{js,jsx,ts,tsx}", "./pages/**/*.{js,jsx,ts,tsx}"],
 
