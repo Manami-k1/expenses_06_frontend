@@ -1,9 +1,6 @@
 import React from "react";
 import { button } from "../../../styled-system/recipes/button";
-import { css } from "styled-system/css";
 import { ButtonVariantProps } from "../../../styled-system/recipes/button";
-
-const style = css({});
 
 export type ButtonProps = ButtonVariantProps &
   React.ButtonHTMLAttributes<HTMLButtonElement>;
