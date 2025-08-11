@@ -1,25 +1,24 @@
 "use client";
 import { Button } from "@/components/common/Button";
-import { useSelectedDate } from "@/hooks/useSelectedDate";
-import {
-  CalendarMonth,
-  createCalendar,
-  getNextMonth,
-  getPrevMonth,
-} from "@/utils/calendar";
-import { useState } from "react";
+import { useCalendarStore } from "@/store/zustand/useCalendarStore";
+import { useSelectedDateStore } from "@/store/zustand/useSelectedDateStore";
+import { useTransactionStore } from "@/store/zustand/useTransactionStore";
+import { useEffect, useMemo } from "react";
 import { css } from "styled-system/css";
 
 const week = ["月", "火", "水", "木", "金", "土", "日"];
 
 export const Calendar = () => {
-  const today = new Date();
-  const [calendar, setCalendar] = useState<CalendarMonth>(() => {
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1;
-    return createCalendar(year, month);
-  });
-  const { selectedDate, setSelectedDate } = useSelectedDate();
+  // const today = new Date();
+  // const [calendar, setCalendar] = useState<CalendarMonth>(() => {
+  //   const year = today.getFullYear();
+  //   const month = today.getMonth() + 1;
+  //   return createCalendar(year, month);
+  // });
+  const { calendar, setCalendar, goToNextMonth, goToPrevMonth } =
+    useCalendarStore();
+  const { selectedDate, setSelectedDate } = useSelectedDateStore();
+  const { dailySummaryList } = useTransactionStore();
 
   const onSelectedDate = (id: number) => {
     setSelectedDate({
@@ -28,15 +27,6 @@ export const Calendar = () => {
       month: calendar.month,
       date: id,
     });
-  };
-
-  const onPrevMonth = () => {
-    const { year, month } = getPrevMonth(calendar.year, calendar.month);
-    setCalendar(createCalendar(year, month));
-  };
-  const onNextMonth = () => {
-    const { year, month } = getNextMonth(calendar.year, calendar.month);
-    setCalendar(createCalendar(year, month));
   };
 
   return (
@@ -56,11 +46,10 @@ export const Calendar = () => {
           alignItems: "center",
           justifyContent: "space-between",
           p: "20px 0",
-          // m: "0 20px auto",
           w: "340px",
         })}
       >
-        <Button onClick={onPrevMonth}>◀︎</Button>
+        <Button onClick={goToPrevMonth}>◀︎</Button>
         <div
           className={css({
             display: "flex",
@@ -72,7 +61,7 @@ export const Calendar = () => {
           <h2 className={css({ fontSize: "month" })}>{calendar.month}月</h2>
           <p className={css({ fontSize: "lg" })}>{calendar.year}</p>
         </div>
-        <Button onClick={onNextMonth}>▶︎</Button>
+        <Button onClick={goToNextMonth}>▶︎</Button>
       </div>
       <div className={css({ display: "flex" })}>
         {week.map((w, i) => (
@@ -94,30 +83,47 @@ export const Calendar = () => {
       <div>
         {calendar?.dateAndWeeks?.map((dweeks, i) => (
           <div key={i} className={css({ display: "flex" })}>
-            {dweeks.map((w, i) => (
-              <div
-                key={i}
-                className={css({
-                  bg: !w ? "#E9E9E9" : w?.isToday ? "#f9e3e3" : "#F1F1F1",
-                  textAlign: "center",
-                  p: "3px",
-                  w: "60px",
-                  h: "72px",
-                  m: "3px",
-                  outlineOffset: "-2px",
-                  outline:
-                    w?.date === selectedDate.date &&
-                    calendar.year === selectedDate.year &&
-                    calendar.month === selectedDate.month
-                      ? "2px solid #EB8282"
-                      : "none",
-                })}
-                id={w?.date.toString()}
-                onClick={() => w && onSelectedDate(w.date)}
-              >
-                {w?.date}
-              </div>
-            ))}
+            {dweeks.map((w, i) => {
+              const summary = dailySummaryList.find((s) => s.day === w?.date);
+              return (
+                <div
+                  key={i}
+                  className={css({
+                    bg: !w ? "#E9E9E9" : w?.isToday ? "#f9e3e3" : "#F1F1F1",
+                    textAlign: "center",
+                    p: "3px",
+                    w: "60px",
+                    h: "72px",
+                    m: "3px",
+                    outlineOffset: "-2px",
+                    outline:
+                      w?.date === selectedDate.date &&
+                      calendar.year === selectedDate.year &&
+                      calendar.month === selectedDate.month
+                        ? "2px solid #EB8282"
+                        : "none",
+                  })}
+                  id={w?.date.toString()}
+                  onClick={() => w && onSelectedDate(w.date)}
+                >
+                  {w?.date}
+                  {summary && (
+                    <div className={css({ fontSize: "xs", mt: "4px" })}>
+                      {summary.income > 0 && (
+                        <div className={css({ color: "green" })}>
+                          +{summary.income}
+                        </div>
+                      )}
+                      {summary.expense > 0 && (
+                        <div className={css({ color: "red" })}>
+                          -{summary.expense}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
