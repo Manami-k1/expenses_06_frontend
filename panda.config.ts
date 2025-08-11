@@ -12,6 +12,7 @@ export default defineConfig({
   staticCss: {
     recipes: {
       button: ["*"],
+      input: ["*"],
     },
   },
   // Whether to use css reset
@@ -28,7 +29,7 @@ export default defineConfig({
     tokens: {
       colors: {
         success: { value: "#EB8282" },
-        successHover: { value: "#ed9797ff" },
+        successHover: { value: "#e36868ff" },
         danger: { value: "#ef4444" },
         dangerHover: { value: "#dc2626" },
         neutral: { value: "#6b7280" },
@@ -102,6 +103,17 @@ export default defineConfig({
 
           defaultVariants: {
             variant: "successFilled",
+          },
+        },
+        input: {
+          base: {
+            fontSize: "sm",
+            borderRadius: "sm",
+            px: "10",
+            py: "6",
+            // minWidth: "70px",
+            bg: "#EEEEEE",
+            display: "block",
           },
         },
       },

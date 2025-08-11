@@ -5,16 +5,19 @@ import { RightPanel } from "@/components/layout/RightPanel";
 const style = css({
   display: "flex",
   height: "100vh",
+  minW: "fit-content",
 });
 export default function Home() {
   return (
     <div className={style}>
       <LeftPanel
+
       // loading={loading}
       // selectedDate={selectedDate}
       // setSelectedDate={setSelectedDate}
       />
       <CalendarPanel
+
       // loading={loading}
       // selectedDate={selectedDate}
       // setSelectedDate={setSelectedDate}
