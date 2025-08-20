@@ -1,22 +1,16 @@
 "use client";
 import { Button } from "@/components/common/Button";
-import { useCalendarStore } from "@/store/zustand/useCalendarStore";
-import { useSelectedDateStore } from "@/store/zustand/useSelectedDateStore";
-import { useTransactionStore } from "@/store/zustand/useTransactionStore";
-import { useEffect, useMemo } from "react";
 import { css } from "styled-system/css";
+import {
+  useCalendarStore,
+  useSelectedDateStore,
+  useTransactionStore,
+} from "@/store/zustand";
 
-const week = ["月", "火", "水", "木", "金", "土", "日"];
+const week = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
 export const Calendar = () => {
-  // const today = new Date();
-  // const [calendar, setCalendar] = useState<CalendarMonth>(() => {
-  //   const year = today.getFullYear();
-  //   const month = today.getMonth() + 1;
-  //   return createCalendar(year, month);
-  // });
-  const { calendar, setCalendar, goToNextMonth, goToPrevMonth } =
-    useCalendarStore();
+  const { calendar, goToNextMonth, goToPrevMonth } = useCalendarStore();
   const { selectedDate, setSelectedDate } = useSelectedDateStore();
   const { dailySummaryList } = useTransactionStore();
 
@@ -45,7 +39,7 @@ export const Calendar = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          p: "20px 0",
+          p: "50px 0 36px",
           w: "340px",
         })}
       >
@@ -68,11 +62,14 @@ export const Calendar = () => {
           <div
             key={i}
             className={css({
-              textAlign: "center",
               w: "60px",
               h: "20px",
               m: "3px",
+              fontWeight: "200",
             })}
+            style={{
+              color: w === "SAT" ? "#67B5DE" : w === "SUN" ? "#E68784" : "",
+            }}
           >
             {w}
           </div>
@@ -89,12 +86,13 @@ export const Calendar = () => {
                 <div
                   key={i}
                   className={css({
-                    bg: !w ? "#E9E9E9" : w?.isToday ? "#f9e3e3" : "#F1F1F1",
+                    bg: "#F1F1F1",
                     textAlign: "center",
-                    p: "3px",
+                    p: "3px 6px",
                     w: "60px",
                     h: "72px",
                     m: "3px",
+                    fontSize: "sm",
                     outlineOffset: "-2px",
                     outline:
                       w?.date === selectedDate.date &&
@@ -106,17 +104,41 @@ export const Calendar = () => {
                   id={w?.date.toString()}
                   onClick={() => w && onSelectedDate(w.date)}
                 >
-                  {w?.date}
+                  <p
+                    style={{
+                      margin: "auto",
+                      borderRadius: "999px",
+                      whiteSpace: "nowrap",
+                      height: "24px",
+                      lineHeight: "24px",
+                      width: "24px",
+                      ...(w?.isToday
+                        ? {
+                            color: "#fff",
+                            fontWeight: "bold",
+                            background: "#EB8282",
+                          }
+                        : {}),
+                    }}
+                  >
+                    {w?.date}
+                  </p>
                   {summary && (
-                    <div className={css({ fontSize: "xs", mt: "4px" })}>
-                      {summary.income > 0 && (
-                        <div className={css({ color: "green" })}>
-                          +{summary.income}
+                    <div
+                      className={css({
+                        fontSize: "xs",
+                        mt: "2px",
+                        textAlign: "right",
+                      })}
+                    >
+                      {summary.income !== "0" && (
+                        <div className={css({ color: "#47AFD5" })}>
+                          ¥{summary.income}
                         </div>
                       )}
-                      {summary.expense > 0 && (
-                        <div className={css({ color: "red" })}>
-                          -{summary.expense}
+                      {summary.expense !== "0" && (
+                        <div className={css({ color: "#F27979" })}>
+                          ¥{summary.expense}
                         </div>
                       )}
                     </div>

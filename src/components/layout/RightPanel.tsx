@@ -1,49 +1,202 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { css } from "../../../styled-system/css";
-import { useSelectedDateStore } from "@/store";
-import { useCalendarStore } from "@/store/zustand/useCalendarStore";
-import { useTransactionStore } from "@/store/zustand/useTransactionStore";
+import {
+  useSelectedDateStore,
+  useCalendarStore,
+  useTransactionStore,
+} from "@/store/zustand";
+import { Button, Input } from "../common";
+import { useForm } from "react-hook-form";
+import {
+  Category,
+  useCategoriesStore,
+} from "@/store/zustand/useCategoriesStore";
+import { CategoryDotLabel } from "../features/category/CategoryDotLabel";
+import { useSnackbar } from "notistack";
+import { TransactionList } from "../features/transaction/TransactionList";
 
 const style = css({
-  width: "calc(100% * 2.6 / 10)",
+  width: "calc((100% - 580px) * 0.55)",
+  p: "30px 20px",
   minWidth: "300px",
-  // bgColor: "#333",
+  maxW: "380px",
+  m: "0 auto",
 });
 export const RightPanel = () => {
-  const { dailyTransactions, reloadData } = useTransactionStore();
+  const { dailyTransactions, totalDaySummary, reloadData } =
+    useTransactionStore();
+  console.log(totalDaySummary);
   const { selectedDate } = useSelectedDateStore();
   const { calendar } = useCalendarStore();
+  const { categories, reloadCategories } = useCategoriesStore();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const deleteTransaction = async (id: number) => {
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Category>({
+    defaultValues: { color: "#b4dfe3" },
+  });
+
+  const onSubmit = (data: Category) => {
+    console.log(data);
+    addCategory(data);
+  };
+
+  const addCategory = async (data: Category) => {
     try {
-      await fetch(`http://localhost:8080/transactions/${id}`, {
+      const response = await fetch("http://localhost:8080/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          name: data.name,
+          color: data.color,
+        }),
+      });
+      const newTransaction = await response.json();
+      console.log(newTransaction);
+
+      await reloadCategories();
+      enqueueSnackbar("カテゴリを追加しました", { variant: "success" });
+    } catch (error) {
+      console.error("カテゴリー追加失敗:", error);
+      enqueueSnackbar("カテゴリの追加に失敗しました", { variant: "error" });
+    }
+  };
+
+  const deleteCategory = async (categoryId: number) => {
+    const res = await fetch(
+      `http://localhost:8080/categories/${categoryId}/has-transactions`
+    );
+    const hasTransactions = await res.json();
+
+    if (hasTransactions) {
+      const confirmed = window.confirm(
+        "このカテゴリには関連する取引があります。削除してもよろしいですか？"
+      );
+      if (!confirmed) return;
+    }
+    try {
+      await fetch(`http://localhost:8080/categories/${categoryId}`, {
         method: "DELETE",
       });
-      await reloadData();
+      await reloadCategories();
+      enqueueSnackbar("カテゴリを削除しました", { variant: "success" });
     } catch (error) {
-      console.error("トランザクション追加失敗:", error);
+      console.log(error);
+      enqueueSnackbar("カテゴリの削除に失敗しました", { variant: "error" });
     }
   };
 
   useEffect(() => {
     reloadData();
-  }, [selectedDate, calendar]);
+  }, [selectedDate, calendar, reloadData]);
 
+  useEffect(() => {
+    reloadCategories();
+  }, [reloadCategories]);
   return (
     <div className={style}>
-      <div>
-        {selectedDate.month}月{selectedDate.date}日
-      </div>
-      <div className={style}>
-        {dailyTransactions.map((d, i) => (
-          <p key={i}>
-            {d.categoryId}-{d.name}-{d.price}-{d.transactionType}
-            <button type="button" onClick={() => deleteTransaction(d.id)}>
-              削除
-            </button>
-          </p>
-        ))}
+      <TransactionList />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className={css({ w: "180px", m: "50px auto" })}>
+          <p className={css({ fontWeight: "bold" })}>カテゴリを追加</p>
+          <div
+            className={css({
+              display: "flex",
+              rowGap: "12",
+              flexDirection: "column",
+              py: "24 28",
+            })}
+          >
+            <Input
+              {...register("name", { required: "カテゴリ名は必須です" })}
+              placeholder="日用品"
+            />
+            <Input
+              type="color"
+              {...register("color", { required: "色は必須です" })}
+              style={{
+                paddingTop: 0,
+                paddingBottom: 0,
+                width: "auto",
+                height: "32px",
+              }}
+            />
+          </div>
+          <div
+            className={css({
+              display: "flex",
+              gap: "12",
+              m: "auto",
+              w: "fit-content",
+            })}
+          >
+            <Button>追加</Button>
+            <Button variant="successText">キャンセル</Button>
+          </div>
+        </div>
+      </form>
+      <div
+        className={css({
+          bg: "#F9F9F9",
+          overflowY: "auto",
+          p: "8 16",
+          h: "160",
+          borderRadius: "14",
+        })}
+      >
+        {categories.filter((c) => c.id !== 1).length === 0 ? (
+          <div
+            className={css({
+              px: "6",
+              py: "2",
+              fontWeight: "bold",
+              fontSize: "sm",
+              justifyContent: "center",
+              display: "flex",
+              alignItems: "center",
+              w: "100%",
+              h: "100%",
+            })}
+          >
+            データがありません
+          </div>
+        ) : (
+          <div
+            className={css({
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 12,
+            })}
+          >
+            {categories
+              .filter((c) => c.id !== 1)
+              .map((c, i) => (
+                <div
+                  key={i}
+                  className={css({
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  })}
+                >
+                  <CategoryDotLabel category={c} editable={true} />
+                  <Button
+                    variant="itemDelete"
+                    type="button"
+                    onClick={() => deleteCategory(c.id)}
+                  >
+                    削
+                  </Button>
+                </div>
+              ))}
+          </div>
+        )}
       </div>
     </div>
   );

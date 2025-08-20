@@ -2,24 +2,29 @@ import { create } from "zustand";
 import { useSelectedDateStore } from "./useSelectedDateStore";
 import { useCalendarStore } from "./useCalendarStore";
 
+type Category = {
+  id: number;
+  name: string;
+  color: string;
+};
 type Transaction = {
   id: number;
   name: string;
-  price: number;
-  categoryId: number;
+  price: string;
+  category: Category;
   transactionType: string;
   date: string;
 };
 type DailySummary = {
   day: number;
-  income: number;
-  expense: number;
+  income: string;
+  expense: string;
 };
 
 type Summary = {
-  income: number;
-  expense: number;
-  net?: number;
+  income: string;
+  expense: string;
+  net: string;
 };
 
 type TransactionState = {
@@ -42,10 +47,10 @@ export const useTransactionStore = create<TransactionState>((set) => ({
   dailyTransactions: [],
   setDailyTransactions: (list) => set({ dailyTransactions: list }),
 
-  totalMonthSummary: { income: 0, expense: 0 },
+  totalMonthSummary: { income: "", expense: "", net: "" },
   setTotalMonthSummary: (summary) => set({ totalMonthSummary: summary }),
 
-  totalDaySummary: { income: 0, expense: 0 },
+  totalDaySummary: { income: "", expense: "", net: "" },
   setTotalDaySummary: (summary) => set({ totalDaySummary: summary }),
 
   dailySummaryList: [],
@@ -66,8 +71,7 @@ export const useTransactionStore = create<TransactionState>((set) => ({
       ),
       fetch(
         `http://localhost:8080/transactions/list?year=${calendar.year}&month=${calendar.month}`
-        // http://localhost:8080/transactions/list?year=2025&month=8
-      ), // ← 新規エンドポイント
+      ),
     ]);
 
     const dailyData = await dailyRes.json();
@@ -79,7 +83,7 @@ export const useTransactionStore = create<TransactionState>((set) => ({
       dailyTransactions: dailyData,
       totalMonthSummary: monthSummary,
       totalDaySummary: daySummary,
-      dailySummaryList, // ← 各日の summary を保持
+      dailySummaryList,
     });
   },
 }));
