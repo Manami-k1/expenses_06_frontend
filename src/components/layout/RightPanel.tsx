@@ -110,7 +110,8 @@ export const RightPanel = () => {
               display: "flex",
               rowGap: "12",
               flexDirection: "column",
-              py: "24 28",
+              pt: "24px",
+              pb: "28px",
             })}
           >
             <Input
@@ -145,7 +146,8 @@ export const RightPanel = () => {
         className={css({
           bg: "#F9F9F9",
           overflowY: "auto",
-          p: "8 16",
+          pt: "8",
+          pb: "16",
           h: "160",
           borderRadius: "14",
         })}

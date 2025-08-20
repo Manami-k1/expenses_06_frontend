@@ -147,7 +147,7 @@ export const LeftPanel = () => {
               display: "flex",
               rowGap: "12",
               flexDirection: "column",
-              py: "24 28",
+              p: "24 0 28",
             })}
           >
             {/* <div> */}
