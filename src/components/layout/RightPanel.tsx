@@ -146,8 +146,8 @@ export const RightPanel = () => {
         className={css({
           bg: "#F9F9F9",
           overflowY: "auto",
-          pt: "8",
-          pb: "16",
+          pt: "8px",
+          pb: "16px",
           h: "160",
           borderRadius: "14",
         })}
@@ -155,8 +155,8 @@ export const RightPanel = () => {
         {categories.filter((c) => c.id !== 1).length === 0 ? (
           <div
             className={css({
-              px: "6",
-              py: "2",
+              px: "6px",
+              py: "2px",
               fontWeight: "bold",
               fontSize: "sm",
               justifyContent: "center",
