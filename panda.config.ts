@@ -15,21 +15,17 @@ export default defineConfig({
       input: ["*"],
     },
   },
-  // Whether to use css reset
   preflight: true,
   globalCss,
-  // Where to look for your css declarations
   include: ["./src/**/*.{js,jsx,ts,tsx}", "./pages/**/*.{js,jsx,ts,tsx}"],
-
-  // Files to exclude
   exclude: [],
-
-  // Useful for theme customization
   theme: {
     tokens: {
       colors: {
         success: { value: "#EB8282" },
         successHover: { value: "#e36868ff" },
+        edit: { value: "#3B82F6" },
+        editHover: { value: "#2563EB" },
         danger: { value: "#ef4444" },
         dangerHover: { value: "#dc2626" },
         neutral: { value: "#6b7280" },
@@ -43,12 +39,13 @@ export default defineConfig({
         lg: { value: "14px" },
       },
       fontSizes: {
+        xxs: { value: "11px" },
         xs: { value: "12px" },
         sm: { value: "14px" },
         md: { value: "16px" },
         lg: { value: "20px" },
         xl: { value: "24px" },
-        h1: { value: "30px" },
+        h1: { value: "28px" },
         month: { value: "32px" },
       },
     },
@@ -59,9 +56,9 @@ export default defineConfig({
             fontSize: "sm",
             borderRadius: "sm",
             fontWeight: "bold",
-            px: "14",
-            py: "7",
+            p: "7",
             minWidth: "70px",
+            flexShrink: 0,
             _hover: {
               cursor: "pointer",
             },
@@ -98,6 +95,22 @@ export default defineConfig({
                 color: "{colors.neutral}",
                 _hover: { color: "{colors.neutralHover}" },
               },
+              itemDelete: {
+                bg: "transparent",
+                color: "{colors.danger}",
+                p: "7",
+                fontSize: "xs",
+                minWidth: "0",
+                _hover: { color: "{colors.dangerHover}" },
+              },
+              itemEdit: {
+                bg: "transparent",
+                color: "{colors.edit}",
+                fontSize: "xs",
+                p: "7",
+                minWidth: "0",
+                _hover: { color: "{colors.editHover}" },
+              },
             },
           },
 
@@ -109,9 +122,8 @@ export default defineConfig({
           base: {
             fontSize: "sm",
             borderRadius: "sm",
-            px: "10",
-            py: "6",
-            // minWidth: "70px",
+            px: "12",
+            py: "8",
             bg: "#EEEEEE",
             display: "block",
           },
@@ -119,6 +131,5 @@ export default defineConfig({
       },
     },
   },
-  // The output directory for your css system
   outdir: "styled-system",
 });

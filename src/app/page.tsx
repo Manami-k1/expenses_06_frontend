@@ -10,23 +10,9 @@ const style = css({
 export default function Home() {
   return (
     <div className={style}>
-      <LeftPanel
-
-      // loading={loading}
-      // selectedDate={selectedDate}
-      // setSelectedDate={setSelectedDate}
-      />
-      <CalendarPanel
-
-      // loading={loading}
-      // selectedDate={selectedDate}
-      // setSelectedDate={setSelectedDate}
-      />
-      <RightPanel
-      // loading={loading}
-      // selectedDate={selectedDate}
-      // setSelectedDate={setSelectedDate}
-      />
+      <LeftPanel />
+      <CalendarPanel />
+      <RightPanel />
     </div>
   );
 }

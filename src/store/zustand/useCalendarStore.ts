@@ -1,4 +1,3 @@
-// store/calendarStore.ts
 import {
   CalendarMonth,
   createCalendar,
