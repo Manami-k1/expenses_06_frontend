@@ -64,13 +64,13 @@ export const CategoryDotLabel: React.FC<CategoryDotLabelProps> = ({
         body: JSON.stringify(data),
       });
 
-      enqueueSnackbar("カテゴリ名を変更しました", { variant: "success" });
+      enqueueSnackbar("カテゴリを更新しました", { variant: "success" });
       await reloadCategories();
       await reloadData();
       setSelectedField("");
     } catch (error) {
       console.error(error);
-      enqueueSnackbar("カラーを変更しました", { variant: "success" });
+      enqueueSnackbar("カテゴリの更新に失敗しました", { variant: "error" });
     }
   };
 
