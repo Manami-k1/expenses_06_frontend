@@ -4,6 +4,7 @@ import {
   useCategoriesStore,
 } from "@/store/zustand/useCategoriesStore";
 import { useTransactionStore } from "@/store/zustand/useTransactionStore";
+import { enqueueSnackbar } from "notistack";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
@@ -47,14 +48,14 @@ export const CategoryDotLabel: React.FC<CategoryDotLabelProps> = ({
   const [selectedField, setSelectedField] = useState<"color" | "name" | "">("");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { register, handleSubmit } = useForm<FormInputs>({
+  const { register, handleSubmit, reset } = useForm<FormInputs>({
     defaultValues: {
       name: category.name,
       color: category.color,
     },
   });
 
-  const onSubmit = async (data: FormInputs) => {
+  const updateCategory = async (data: FormInputs) => {
     console.log("更新データ:", data);
     try {
       await fetch(`http://localhost:8080/categories/${category.id}`, {
@@ -63,17 +64,32 @@ export const CategoryDotLabel: React.FC<CategoryDotLabelProps> = ({
         body: JSON.stringify(data),
       });
 
+      enqueueSnackbar("カテゴリ名を変更しました", { variant: "success" });
       await reloadCategories();
       await reloadData();
       setSelectedField("");
     } catch (error) {
       console.error(error);
+      enqueueSnackbar("カラーを変更しました", { variant: "success" });
     }
+  };
+
+  const onValid = async (data: FormInputs) => {
+    console.log("成功:", data);
+    await updateCategory(data);
+  };
+
+  const onInvalid = (errors: any) => {
+    console.log("バリデーションエラー:", errors);
+    const firstError =
+      errors.name?.message || errors.color?.message || "入力エラーがあります";
+    reset();
+    enqueueSnackbar(firstError, { variant: "error" });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      handleSubmit(onSubmit)();
+      handleSubmit(onValid, onInvalid)();
     }
   };
 
@@ -125,7 +141,10 @@ export const CategoryDotLabel: React.FC<CategoryDotLabelProps> = ({
 
       {editable && selectedField === "name" && (
         <Input
-          {...register("name")}
+          {...register("name", {
+            validate: (value) =>
+              value.trim() !== "" || "空白のみの名前は無効です",
+          })}
           autoFocus
           onKeyDown={handleKeyDown}
           style={{ position: "absolute", left: "26px", width: "100px" }}

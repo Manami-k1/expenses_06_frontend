@@ -60,12 +60,6 @@ export const LeftPanel = () => {
     enqueueSnackbar(firstError, { variant: "error" });
   };
 
-  // フォーム送信時の処理
-  const onSubmit = (data: Transaction) => {
-    console.log(data);
-    addTransaction(data);
-  };
-
   useEffect(() => {
     (async () => {
       await reloadData();
@@ -99,6 +93,7 @@ export const LeftPanel = () => {
       enqueueSnackbar("収支項目の追加に失敗しました", { variant: "error" });
     }
   };
+
   return (
     <div className={style}>
       <div
