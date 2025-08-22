@@ -1,18 +1,21 @@
 "use client";
-
+import React, { FC, ReactNode } from "react";
 import { SnackbarProvider } from "notistack";
 
-export const ClientProviders = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+type ClientProviderProps = {
+  children: ReactNode;
+};
+
+const ClientProvider: FC<ClientProviderProps> = ({ children }) => {
   return (
     <SnackbarProvider
       maxSnack={3}
+      autoHideDuration={3000}
       anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
     >
       {children}
     </SnackbarProvider>
   );
 };
+
+export default ClientProvider;

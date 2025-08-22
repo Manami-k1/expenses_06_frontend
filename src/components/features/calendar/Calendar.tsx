@@ -66,6 +66,7 @@ export const Calendar = () => {
               h: "20px",
               m: "3px",
               fontWeight: "200",
+              textAlign: "center",
             })}
             style={{
               color: w === "SAT" ? "#67B5DE" : w === "SUN" ? "#E68784" : "",

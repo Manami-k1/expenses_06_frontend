@@ -31,7 +31,7 @@ type Transaction = {
 export const LeftPanel = () => {
   const { selectedDate } = useSelectedDateStore();
   const { calendar } = useCalendarStore();
-  const categories = useCategoriesStore((state) => state.categories);
+  const { categories } = useCategoriesStore();
   console.log(categories);
   const { reloadData, totalMonthSummary } = useTransactionStore();
   const { enqueueSnackbar } = useSnackbar();
@@ -39,6 +39,7 @@ export const LeftPanel = () => {
     control,
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<Transaction>({
     defaultValues: { transactionType: "expense", categoryId: 1 },
@@ -46,7 +47,7 @@ export const LeftPanel = () => {
 
   const onValid = async (data: Transaction) => {
     console.log("成功:", data);
-    await addTransaction(data); // ここで追加処理実行
+    await addTransaction(data);
   };
 
   const onInvalid = (errors: any) => {
@@ -90,6 +91,7 @@ export const LeftPanel = () => {
 
       const newTransaction = await response.json();
       console.log("登録されたトランザクション:", newTransaction);
+      reset();
       await reloadData();
       enqueueSnackbar("収支項目を追加しました", { variant: "success" });
     } catch (error) {
@@ -141,17 +143,16 @@ export const LeftPanel = () => {
       </div>
       <form onSubmit={handleSubmit(onValid, onInvalid)}>
         <div className={css({ w: "180px", m: "80px auto" })}>
-          <p className={css({ fontWeight: "bold" })}>アイテムを追加</p>
+          <p className={css({ fontWeight: "bold" })}>収支項目を追加</p>
           <div
             className={css({
               display: "flex",
               rowGap: "12",
               flexDirection: "column",
-              py: "24 28",
+              pt: "24px",
+              pb: "28px",
             })}
           >
-            {/* <div> */}
-
             <div
               className={css({
                 display: "flex",
@@ -177,35 +178,22 @@ export const LeftPanel = () => {
               />
             </div>
             <Input {...register("name")} placeholder="洗剤" />
-            {/* {errors.name && <p>{errors.name.message}</p>} */}
-            {/* <Input
-            {...register("categoryId", { required: "カテゴリは必須です" })}
-          /> */}
             <Controller
               name="categoryId"
               control={control}
               render={({ field }) => (
                 <Select
                   {...field}
-                  // value={field.value?.toString() || ""}
-                  // // options={categories?.map((c) => ({
-                  // //   value: c.id.toString(),
-                  // //   name: c.name,
-                  // // }))}
-                  // options={categories}
-                  // onChange={(category) => field.onChange(category.id)}
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(value) => field.onChange(value)}
                   options={categories}
                 />
               )}
             />
-            {/* {errors.categoryId && <p>{errors.categoryId.message}</p>} */}
             <p className={css({ textAlign: "right" })}>
               {selectedDate.year}-{zeroPad(selectedDate.month, 2)}-
               {zeroPad(selectedDate.date, 2)}
             </p>
-            {/* </div> */}
           </div>
           <div
             className={css({
@@ -216,7 +204,9 @@ export const LeftPanel = () => {
             })}
           >
             <Button>追加</Button>
-            <Button variant="successText">キャンセル</Button>
+            <Button variant="successText" type="button" onClick={() => reset()}>
+              キャンセル
+            </Button>
           </div>
         </div>
       </form>

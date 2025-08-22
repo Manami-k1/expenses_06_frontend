@@ -4,13 +4,11 @@
   "private": true,
   "scripts": {
     "panda:codegen": "panda codegen",
-    "build:safelist": "node src/scripts/build-safelist.mjs",
-    "build:all": "npm run build:safelist && npm run panda:codegen",
-    "dev": "concurrently \"npm run build:safelist && panda codegen --watch\" \"next dev --turbopack\"",
+    "build:all": "npm run panda:codegen",
+    "dev": "concurrently \"panda codegen --watch\" \"next dev --turbopack\"",
     "build": "npm run build:all && next build",
     "start": "next start",
-    "lint": "next lint",
-    "prepare": "panda codegen"
+    "lint": "next lint"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",

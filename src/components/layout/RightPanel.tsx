@@ -15,6 +15,7 @@ import {
 import { CategoryDotLabel } from "../features/category/CategoryDotLabel";
 import { useSnackbar } from "notistack";
 import { TransactionList } from "../features/transaction/TransactionList";
+import { useConfirmSnackbar } from "@/hooks/useConfirmSnackbar";
 
 const style = css({
   width: "calc((100% - 580px) * 0.55)",
@@ -24,26 +25,34 @@ const style = css({
   m: "0 auto",
 });
 export const RightPanel = () => {
-  const { dailyTransactions, totalDaySummary, reloadData } =
-    useTransactionStore();
+  const { totalDaySummary, reloadData } = useTransactionStore();
   console.log(totalDaySummary);
   const { selectedDate } = useSelectedDateStore();
   const { calendar } = useCalendarStore();
   const { categories, reloadCategories } = useCategoriesStore();
   const { enqueueSnackbar } = useSnackbar();
+  const { confirm } = useConfirmSnackbar();
 
   const {
     control,
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<Category>({
     defaultValues: { color: "#b4dfe3" },
   });
 
-  const onSubmit = (data: Category) => {
-    console.log(data);
-    addCategory(data);
+  const onValid = async (data: Category) => {
+    console.log("成功:", data);
+    await addCategory(data);
+  };
+
+  const onInvalid = (errors: any) => {
+    console.log("バリデーションエラー:", errors);
+    const firstError =
+      errors.name?.message || errors.color?.message || "入力エラーがあります";
+    enqueueSnackbar(firstError, { variant: "error" });
   };
 
   const addCategory = async (data: Category) => {
@@ -59,7 +68,7 @@ export const RightPanel = () => {
       });
       const newTransaction = await response.json();
       console.log(newTransaction);
-
+      reset();
       await reloadCategories();
       enqueueSnackbar("カテゴリを追加しました", { variant: "success" });
     } catch (error) {
@@ -75,7 +84,7 @@ export const RightPanel = () => {
     const hasTransactions = await res.json();
 
     if (hasTransactions) {
-      const confirmed = window.confirm(
+      const confirmed = await confirm(
         "このカテゴリには関連する取引があります。削除してもよろしいですか？"
       );
       if (!confirmed) return;
@@ -102,7 +111,7 @@ export const RightPanel = () => {
   return (
     <div className={style}>
       <TransactionList />
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onValid, onInvalid)}>
         <div className={css({ w: "180px", m: "50px auto" })}>
           <p className={css({ fontWeight: "bold" })}>カテゴリを追加</p>
           <div
@@ -110,7 +119,8 @@ export const RightPanel = () => {
               display: "flex",
               rowGap: "12",
               flexDirection: "column",
-              py: "24 28",
+              pt: "24px",
+              pb: "28px",
             })}
           >
             <Input
@@ -137,7 +147,9 @@ export const RightPanel = () => {
             })}
           >
             <Button>追加</Button>
-            <Button variant="successText">キャンセル</Button>
+            <Button variant="successText" type="button" onClick={() => reset()}>
+              キャンセル
+            </Button>
           </div>
         </div>
       </form>
@@ -145,7 +157,8 @@ export const RightPanel = () => {
         className={css({
           bg: "#F9F9F9",
           overflowY: "auto",
-          p: "8 16",
+          py: "12px",
+          px: "16px",
           h: "160",
           borderRadius: "14",
         })}
@@ -153,8 +166,6 @@ export const RightPanel = () => {
         {categories.filter((c) => c.id !== 1).length === 0 ? (
           <div
             className={css({
-              px: "6",
-              py: "2",
               fontWeight: "bold",
               fontSize: "sm",
               justifyContent: "center",
@@ -171,7 +182,8 @@ export const RightPanel = () => {
             className={css({
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: 12,
+              columnGap: "6px",
+              rowGap: "3px",
             })}
           >
             {categories
