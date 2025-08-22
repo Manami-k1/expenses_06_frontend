@@ -56,13 +56,6 @@ export const CategoryDotLabel: React.FC<CategoryDotLabelProps> = ({
 
   const onSubmit = async (data: FormInputs) => {
     console.log("更新データ:", data);
-
-    // ✅ 本来はここでバックエンドにPUT送信:
-    // await fetch(`http://localhost:8080/categories/${category.id}`, {
-    //   method: "PUT",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(data),
-    // });
     try {
       await fetch(`http://localhost:8080/categories/${category.id}`, {
         method: "PUT",
@@ -72,7 +65,7 @@ export const CategoryDotLabel: React.FC<CategoryDotLabelProps> = ({
 
       await reloadCategories();
       await reloadData();
-      setSelectedField(""); // 閉じる
+      setSelectedField("");
     } catch (error) {
       console.error(error);
     }
@@ -143,7 +136,6 @@ export const CategoryDotLabel: React.FC<CategoryDotLabelProps> = ({
           <Input
             type="color"
             {...register("color")}
-            // autoFocus
             onKeyDown={handleKeyDown}
             style={{ paddingTop: 0, paddingBottom: 0, width: "100px" }}
           />
