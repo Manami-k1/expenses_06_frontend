@@ -5,9 +5,9 @@
   "scripts": {
     "panda:codegen": "panda codegen",
     "build:all": "npm run panda:codegen",
-    "dev": "concurrently \"panda codegen --watch\" \"next dev --turbopack\"",
+    "dev": "concurrently \"panda codegen --watch\" \"next dev --turbopack -p 4000\"",
     "build": "npm run build:all && next build",
-    "start": "next start",
+    "start": "next start -p 4000",
     "lint": "next lint"
   },
   "dependencies": {
